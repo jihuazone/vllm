@@ -76,8 +76,12 @@ _NUM_WARMUP_ITERS = 2
 TModelInputForGPU = TypeVar('TModelInputForGPU', bound="ModelInputForGPU")
 
 # For now, bump up cache limits for recompilations during CUDA graph warmups.
-torch._dynamo.config.cache_size_limit = 128
-torch._dynamo.config.accumulated_cache_size_limit = 128
+# 后向兼容pytorch 2.1
+try:
+    torch._dynamo.config.cache_size_limit = 128
+    torch._dynamo.config.accumulated_cache_size_limit = 128
+except AttributeError:
+    pass
 
 
 @dataclass(frozen=True)

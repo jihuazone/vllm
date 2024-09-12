@@ -27,7 +27,7 @@ from vllm.sequence import (ExecuteModelRequest, IntermediateTensors,
 from vllm.worker.cache_engine import CacheEngine
 from vllm.worker.embedding_model_runner import EmbeddingModelRunner
 from vllm.worker.enc_dec_model_runner import EncoderDecoderModelRunner
-# from vllm.worker.npu_model_runner import NPUModelRunnerBase, NPUModelRunner
+from vllm.worker.npu_model_runner import NPUModelRunnerBase, NPUModelRunner
 from vllm.worker.worker_base import LocalOrDistributedWorkerBase, WorkerInput
 
 logger = init_logger(__name__)
