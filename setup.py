@@ -265,6 +265,10 @@ def _is_neuron() -> bool:
     return torch_neuronx_installed or VLLM_TARGET_DEVICE == "neuron"
 
 
+def _is_npu() -> bool:
+    return VLLM_TARGET_DEVICE == "npu"
+
+
 def _is_tpu() -> bool:
     return VLLM_TARGET_DEVICE == "tpu"
 
@@ -286,7 +290,7 @@ def _build_custom_ops() -> bool:
 
 
 def _build_core_ext() -> bool:
-    return not (_is_neuron() or _is_tpu() or _is_openvino() or _is_xpu())
+    return not (_is_neuron() or _is_npu() or _is_tpu() or _is_openvino() or _is_xpu()) 
 
 
 def get_hipcc_rocm_version():
@@ -384,6 +388,8 @@ def get_vllm_version() -> str:
         if neuron_version != MAIN_CUDA_VERSION:
             neuron_version_str = neuron_version.replace(".", "")[:3]
             version += f"+neuron{neuron_version_str}"
+    elif _is_npu():
+        version += "+npu"
     elif _is_openvino():
         version += "+openvino"
     elif _is_tpu():
@@ -439,6 +445,8 @@ def get_requirements() -> List[str]:
         requirements = _read_requirements("requirements-rocm.txt")
     elif _is_neuron():
         requirements = _read_requirements("requirements-neuron.txt")
+    elif _is_npu():
+        requirements = _read_requirements("requirements-npu.txt")
     elif _is_openvino():
         requirements = _read_requirements("requirements-openvino.txt")
     elif _is_tpu():
