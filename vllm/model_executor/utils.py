@@ -5,6 +5,8 @@ from typing import Any, Dict, Optional
 import numpy as np
 import torch
 
+from vllm.utils import is_npu
+
 
 def set_random_seed(seed: int) -> None:
     random.seed(seed)
@@ -12,6 +14,8 @@ def set_random_seed(seed: int) -> None:
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+    if is_npu():
+        torch.npu.manual_seed_all(seed)
 
 
 def set_weight_attrs(

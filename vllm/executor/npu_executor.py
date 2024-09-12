@@ -17,7 +17,7 @@ from vllm.worker.worker_base import WorkerBase
 logger = init_logger(__name__)
 
 
-class XPUExecutor(GPUExecutor):
+class NPUExecutor(GPUExecutor):
 
     uses_ray: bool = False
 
@@ -51,7 +51,7 @@ class XPUExecutor(GPUExecutor):
         self.speculative_config = None
         self.observability_config = observability_config
 
-        # Instantiate the worker and load the model to GPU.
+        # Instantiate the worker and load the model to NPU.
         self._init_executor()
 
     def _get_worker_module_and_class(
