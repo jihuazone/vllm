@@ -338,6 +338,15 @@ def is_neuron() -> bool:
 
 
 @lru_cache(maxsize=None)
+def is_npu() -> bool:
+    try:
+        import torch_npu  # noqa: F401
+    except ImportError:
+        return False
+    return hasattr(torch, "npu") and torch.npu.is_available()
+
+
+@lru_cache(maxsize=None)
 def is_xpu() -> bool:
     from importlib.metadata import PackageNotFoundError, version
     try:
@@ -757,6 +766,9 @@ class CudaMemoryProfiler:
         if torch.cuda.is_available():
             torch.cuda.reset_peak_memory_stats(self.device)
             mem = torch.cuda.max_memory_allocated(self.device)
+        elif is_npu():
+            torch.npu.reset_peak_memory_stats(self.device)
+            mem = torch.npu.max_memory_allocated(self.device)
         elif is_xpu():
             torch.xpu.reset_peak_memory_stats(self.device)  # type: ignore
             mem = torch.xpu.max_memory_allocated(self.device)  # type: ignore

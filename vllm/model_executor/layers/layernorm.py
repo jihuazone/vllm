@@ -66,6 +66,30 @@ class RMSNorm(CustomOp):
             self.variance_epsilon,
         )
         return out
+    
+    # def forward_npu(
+    #     self,
+    #     x: torch.Tensor,
+    #     residual: Optional[torch.Tensor] = None,
+    # ) -> Union[torch.Tensor, Tuple[torch.Tensor, torch.Tensor]]:
+    #     from vllm._torch_npu_ops import torch_npu_ops as ops
+
+    #     if residual is not None:
+    #         ops.fused_add_rms_norm(
+    #             x,
+    #             residual,
+    #             self.weight.data,
+    #             self.variance_epsilon,
+    #         )
+    #         return x, residual
+    #     out = torch.empty_like(x)
+    #     ops.rms_norm(
+    #         out,
+    #         x,
+    #         self.weight.data,
+    #         self.variance_epsilon,
+    #     )
+    #     return out
 
     def forward_xpu(
         self,

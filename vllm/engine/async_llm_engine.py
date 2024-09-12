@@ -644,6 +644,9 @@ class AsyncLLMEngine:
         elif engine_config.device_config.device_type == "neuron":
             from vllm.executor.neuron_executor import NeuronExecutorAsync
             executor_class = NeuronExecutorAsync
+        # elif engine_config.device_config.device_type == "npu":
+            # from vllm.executor.npu_executor import NPUExecutorAsync
+            # executor_class = NPUExecutorAsync
         elif engine_config.device_config.device_type == "tpu":
             if distributed_executor_backend == "ray":
                 initialize_ray_cluster(engine_config.parallel_config)

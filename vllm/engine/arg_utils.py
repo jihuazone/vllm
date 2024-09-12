@@ -30,6 +30,7 @@ DEVICE_OPTIONS = [
     "auto",
     "cuda",
     "neuron",
+    "npu",
     "cpu",
     "openvino",
     "tpu",

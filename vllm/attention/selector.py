@@ -10,7 +10,7 @@ import vllm.envs as envs
 from vllm.attention.backends.abstract import AttentionBackend
 from vllm.logger import init_logger
 from vllm.platforms import current_platform
-from vllm.utils import STR_BACKEND_ENV_VAR, is_cpu, is_hip, is_openvino, is_xpu
+from vllm.utils import STR_BACKEND_ENV_VAR, is_cpu, is_hip, is_npu, is_openvino, is_xpu
 
 logger = init_logger(__name__)
 
@@ -24,6 +24,7 @@ class _Backend(enum.Enum):
     FLASHINFER = enum.auto()
     PALLAS = enum.auto()
     IPEX = enum.auto()
+    TORCH_NPU = enum.auto()
 
 
 def backend_name_to_enum(backend_name: str) -> _Backend:
@@ -128,6 +129,10 @@ def get_attn_backend(
         logger.info("Using Torch SDPA backend.")
         from vllm.attention.backends.torch_sdpa import TorchSDPABackend
         return TorchSDPABackend
+    elif backend == _Backend.TORCH_NPU:
+        logger.info("Using Torch NPU backend.")
+        # TODO.
+        # from vllm.attention.backends.torch_npu import TorchNPUBackend 
     elif backend == _Backend.OPENVINO:
         logger.info("Using OpenVINO Attention backend.")
         from vllm.attention.backends.openvino import OpenVINOAttentionBackend
@@ -182,6 +187,11 @@ def which_attn_to_use(
         if selected_backend != _Backend.TORCH_SDPA:
             logger.info("Cannot use %s backend on CPU.", selected_backend)
         return _Backend.TORCH_SDPA
+    
+    if is_npu():
+        if selected_backend != _Backend.TORCH_NPU:
+            logger.info("Cannot use %s backend on Torch NPU.", selected_backend)
+        return _Backend.TORCH_NPU
 
     if is_openvino():
         if selected_backend != _Backend.OPENVINO:

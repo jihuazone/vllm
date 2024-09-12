@@ -132,6 +132,7 @@ class VocabParallelEmbeddingShardIndices:
         assert self.num_added_elements <= self.num_added_elements_padded
 
 
+# TODO: torch npu doesn't support torch.jit.scirpt
 @torch.jit.script
 def get_masked_input_and_mask(
         input_: torch.Tensor, org_vocab_start_index: int,
