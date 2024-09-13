@@ -61,7 +61,7 @@ class CustomOp(nn.Module):
         if is_hip():
             return self.forward_hip
         elif is_npu():
-            return self.forward_npu()
+            return self.forward_npu
         elif is_cpu():
             return self.forward_cpu
         elif current_platform.is_tpu():
