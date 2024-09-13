@@ -130,9 +130,10 @@ def get_attn_backend(
         from vllm.attention.backends.torch_sdpa import TorchSDPABackend
         return TorchSDPABackend
     elif backend == _Backend.TORCH_NPU:
+        assert is_npu(), RuntimeError(
+            "Torch NPU backend is only used for the NPU device.")
         logger.info("Using Torch NPU backend.")
-        # TODO.
-        # from vllm.attention.backends.torch_npu import TorchNPUBackend 
+        from vllm.attention.backends.torch_npu_attn import TorchNPUAttnBackend 
     elif backend == _Backend.OPENVINO:
         logger.info("Using OpenVINO Attention backend.")
         from vllm.attention.backends.openvino import OpenVINOAttentionBackend

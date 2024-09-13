@@ -1,0 +1,3 @@
+"""Attention layer with with torch_npu."""
+class TorchNPUAttnBackend:
+    ...
