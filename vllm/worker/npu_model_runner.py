@@ -159,6 +159,9 @@ class ModelInputForNPUBuilder(ModelRunnerInputBuilderBase[ModelInputForNPU]):
         input_positions: List[int] = []
         slot_mapping: List[int] = []
         seq_lens: List[int] = []
+        context_lens: List[int] = []
+        query_lens: List[int] = []
+        slot_indices: List[List[List[int]]] = []
         multi_modal_inputs_list: List[MultiModalInputs] = []
 
         for seq_group_metadata in seq_group_metadata_list:
@@ -171,9 +174,12 @@ class ModelInputForNPUBuilder(ModelRunnerInputBuilderBase[ModelInputForNPU]):
             prompt_tokens = seq_data.get_token_ids()
             computed_len = seq_data.get_num_computed_tokens()
             seq_len = len(prompt_tokens)
+            query_len = seq_len - computed_len
 
             seq_lens.append(seq_len)  # Prompt token num
             input_tokens.extend(prompt_tokens)  # Token ids
+            context_lens.append(computed_len)
+            query_lens.append(query_len)
 
             # Token position ids
             # NOTE(woosuk): Here we assume that the first token in the prompt
@@ -219,6 +225,15 @@ class ModelInputForNPUBuilder(ModelRunnerInputBuilderBase[ModelInputForNPU]):
         slot_mapping = torch.tensor(slot_mapping,
                                     dtype=torch.long,
                                     device=self.device)  # type: ignore
+        context_lens_tensor = torch.tensor(context_lens,
+                                    dtype=torch.long,
+                                    device=self.device)  # type: ignore
+        seq_lens_tensor = torch.tensor(seq_lens,
+                                    dtype=torch.int,
+                                    device=self.device)  # type: ignore
+        query_lens_tensor = torch.tensor(query_lens,
+                                    dtype=torch.int32,
+                                    device=self.device)  # type: ignore
 
         max_seqlen = max(seq_lens)
         tmp = [0]
@@ -230,9 +245,10 @@ class ModelInputForNPUBuilder(ModelRunnerInputBuilderBase[ModelInputForNPU]):
             is_prompt=True,
             slot_mapping=slot_mapping,
             seq_lens=seq_lens,
-            seqlen_q=seqlen_q,
-            max_seqlen=max_seqlen,
-            seq_lens_tensor=torch.tensor([]),
+            seq_lens_tensor=seq_lens_tensor,
+            max_prefill_seq_len=max_seqlen,
+            query_lens_tensor=query_lens_tensor,
+            context_lens_tensor=context_lens_tensor,
             max_decode_seq_len=0,
             num_prefills=len(seq_lens),
             num_prefill_tokens=num_prompt_tokens,

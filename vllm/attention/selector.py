@@ -133,7 +133,8 @@ def get_attn_backend(
         assert is_npu(), RuntimeError(
             "Torch NPU backend is only used for the NPU device.")
         logger.info("Using Torch NPU backend.")
-        from vllm.attention.backends.torch_npu_attn import TorchNPUAttnBackend 
+        from vllm.attention.backends.torch_npu_attn import TorchNPUAttnBackend
+        return TorchNPUAttnBackend
     elif backend == _Backend.OPENVINO:
         logger.info("Using OpenVINO Attention backend.")
         from vllm.attention.backends.openvino import OpenVINOAttentionBackend
