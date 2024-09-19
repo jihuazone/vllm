@@ -498,8 +498,8 @@ class LLMEngine:
             if distributed_executor_backend == "ray":
                 # TODO
                 pass
-            from vllm.executor.npu_executor import NpuExecutor
-            executor_class = NpuExecutor
+            from vllm.executor.npu_executor import NPUExecutor
+            executor_class = NPUExecutor
         elif engine_config.device_config.device_type == "tpu":
             if distributed_executor_backend == "ray":
                 initialize_ray_cluster(engine_config.parallel_config)
