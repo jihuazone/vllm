@@ -1048,6 +1048,8 @@ class DeviceConfig:
                 self.device_type = "tpu"
             elif current_platform.is_cpu():
                 self.device_type = "cpu"
+            elif current_platform.is_npu():
+                self.device_type = "npu"
             elif is_xpu():
                 self.device_type = "xpu"
             else:

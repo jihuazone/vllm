@@ -9,6 +9,7 @@ class PlatformEnum(enum.Enum):
     ROCM = enum.auto()
     TPU = enum.auto()
     CPU = enum.auto()
+    NPU = enum.auto()
     UNSPECIFIED = enum.auto()
 
 
@@ -43,6 +44,9 @@ class Platform:
 
     def is_cpu(self) -> bool:
         return self._enum == PlatformEnum.CPU
+    
+    def is_npu(self) -> bool:
+        return self._enum == PlatformEnum.NPU
 
     def is_cuda_alike(self) -> bool:
         """Stateless version of :func:`torch.cuda.is_available`."""

@@ -16,6 +16,16 @@ try:
 except Exception:
     pass
 
+is_npu = False
+try:
+    # While it's technically possible to install torch_npu on a non-NPU machine,
+    # this is a very uncommon scenario. Therefore, we assume that torch_npu is
+    # installed if and only if the machine has NPUs.
+    import torch_npu  # noqa: F401
+    is_npu = True
+except Exception:
+    pass
+
 is_cuda = False
 
 try:
@@ -54,6 +64,9 @@ if is_tpu:
     # so we need to check tpu first
     from .tpu import TpuPlatform
     current_platform = TpuPlatform()
+elif is_npu:
+    from .npu import NpuPlatform
+    current_platform = NpuPlatform()
 elif is_cuda:
     from .cuda import CudaPlatform
     current_platform = CudaPlatform()
