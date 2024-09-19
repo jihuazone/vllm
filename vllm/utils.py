@@ -340,6 +340,7 @@ def is_neuron() -> bool:
 @lru_cache(maxsize=None)
 def is_npu() -> bool:
     try:
+        import torch
         import torch_npu  # noqa: F401
     except ImportError:
         return False
