@@ -1,0 +1,7 @@
+# Common dependencies
+-r requirements-common.txt
+
+decorator
+pyyaml
+scipy
+setuptools
