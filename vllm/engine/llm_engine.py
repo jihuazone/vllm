@@ -494,6 +494,12 @@ class LLMEngine:
         elif engine_config.device_config.device_type == "neuron":
             from vllm.executor.neuron_executor import NeuronExecutor
             executor_class = NeuronExecutor
+        elif engine_config.device_config.device_type == "npu":
+            if distributed_executor_backend == "ray":
+                # TODO
+                pass
+            from vllm.executor.npu_executor import NpuExecutor
+            executor_class = NpuExecutor
         elif engine_config.device_config.device_type == "tpu":
             if distributed_executor_backend == "ray":
                 initialize_ray_cluster(engine_config.parallel_config)
