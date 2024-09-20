@@ -397,6 +397,9 @@ def seed_everything(seed: int) -> None:
     if current_platform.is_cuda_alike():
         torch.cuda.manual_seed_all(seed)
 
+    if current_platform.is_npu():
+        torch.npu.manual_seed_all(seed)
+
     if is_xpu():
         torch.xpu.manual_seed_all(seed)
 

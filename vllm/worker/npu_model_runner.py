@@ -1,0 +1,6 @@
+class NPUModelRunnerBase:
+    ...
+
+
+class NPUModelRunner(NPUModelRunnerBase):
+    ...
