@@ -17,7 +17,7 @@ from vllm.sequence import SequenceGroupMetadata
 from vllm.worker.cache_engine import CacheEngine
 from vllm.worker.embedding_model_runner import EmbeddingModelRunner
 from vllm.worker.enc_dec_model_runner import EncoderDecoderModelRunner
-from vllm.worker.npu_model_runner import NPUModelRunnerBase, NPUModelRunner
+from vllm.worker.npu_model_runner import NPUModelRunner
 from vllm.worker.worker import Worker
 
 
@@ -37,7 +37,7 @@ class NPUWorker(Worker):
         speculative_config: Optional[SpeculativeConfig] = None,
         prompt_adapter_config: Optional[PromptAdapterConfig] = None,
         is_driver_worker: bool = False,
-        model_runner_cls: Optional[Type[NPUModelRunnerBase]] = None,
+        model_runner_cls: Optional[Type[NPUModelRunner]] = None,
         observability_config: Optional[ObservabilityConfig] = None,
     ) -> None:
         assert device_config.device_type == "npu"
@@ -73,14 +73,14 @@ class NPUWorker(Worker):
                 not in ["medusa", "mlp_speculator", "eagle"]) \
                     else {"return_hidden_states": True}
 
-        ModelRunnerClass: Type[NPUModelRunnerBase] = NPUModelRunner
+        ModelRunnerClass: Type[NPUModelRunner] = NPUModelRunner
         if model_runner_cls is not None:
             ModelRunnerClass = model_runner_cls
         elif self._is_embedding_model():
             ModelRunnerClass = EmbeddingModelRunner
         elif self._is_encoder_decoder_model():
             ModelRunnerClass = EncoderDecoderModelRunner
-        self.model_runner: NPUModelRunnerBase = ModelRunnerClass(
+        self.model_runner: NPUModelRunner = ModelRunnerClass(
             model_config,
             parallel_config,
             scheduler_config,
