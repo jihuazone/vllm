@@ -2,7 +2,7 @@ import torch.nn as nn
 
 import vllm.envs as envs
 from vllm.platforms import current_platform
-from vllm.utils import is_cpu, is_hip, is_xpu
+from vllm.utils import is_cpu, is_hip, is_xpu, is_npu
 
 
 class CustomOp(nn.Module):
@@ -29,6 +29,11 @@ class CustomOp(nn.Module):
     def forward_hip(self, *args, **kwargs):
         # By default, we assume that HIP ops are compatible with CUDA ops.
         return self.forward_cuda(*args, **kwargs)
+    
+    def forward_npu(self, *args, **kwargs):
+        # By default, we assume that NPU ops are compatible with the
+        # PyTorch-native implementation.
+        return self.forward_native(*args, **kwargs)
 
     def forward_xpu(self, *args, **kwargs):
         # By default, we assume that XPU ops are compatible with the
@@ -64,6 +69,8 @@ class CustomOp(nn.Module):
             return self.forward_cpu
         elif current_platform.is_tpu():
             return self.forward_tpu
+        elif is_npu():
+            return self.forward_npu
         elif is_xpu():
             return self.forward_xpu
         else:
