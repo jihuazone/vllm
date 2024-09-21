@@ -770,7 +770,7 @@ def is_pin_memory_available() -> bool:
     return True
 
 
-class CudaMemoryProfiler:
+class DeviceMemoryProfiler:
 
     def __init__(self, device: Optional[torch.types.Device] = None):
         self.device = device
@@ -780,6 +780,9 @@ class CudaMemoryProfiler:
         if current_platform.is_cuda_alike():
             torch.cuda.reset_peak_memory_stats(self.device)
             mem = torch.cuda.max_memory_allocated(self.device)
+        elif current_platform.is_npu():
+            torch.npu.reset_peak_memory_stats(self.device)
+            mem = torch.npu.max_memory_allocated(self.device)
         elif is_xpu():
             torch.xpu.reset_peak_memory_stats(self.device)  # type: ignore
             mem = torch.xpu.max_memory_allocated(self.device)  # type: ignore
