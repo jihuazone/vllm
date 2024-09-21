@@ -1,3 +1,5 @@
+import math
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple, Type
 
 import torch
@@ -7,6 +9,8 @@ from vllm.attention.backends.abstract import (AttentionBackend, AttentionImpl,
                                               AttentionMetadata, AttentionType)
 from vllm.attention.backends.utils import CommonAttentionState, CommonMetadataBuilder
 from vllm.attention.ops.paged_attn import PagedAttentionMetadata
+
+SHARE_MASK_TRIL_PREFIX_CACHE = None
 
 class TorchNPUBackend(AttentionBackend):
     
@@ -23,7 +27,7 @@ class TorchNPUBackend(AttentionBackend):
         return TorchNPUMetadata
 
     @staticmethod
-    def get_builder_cls() -> type[TorchNPUMetadataBuilder]:
+    def get_builder_cls() -> type["TorchNPUMetadataBuilder"]:
         return TorchNPUMetadataBuilder
 
     @staticmethod
@@ -70,6 +74,7 @@ class TorchNPUBackend(AttentionBackend):
                 value_caches[layer_id][dst] = value_caches[layer_id][src]
 
 
+@dataclass
 class TorchNPUMetadata(AttentionMetadata, PagedAttentionMetadata):
     """Metadata for TorchNPUBackend."""
 
@@ -186,8 +191,7 @@ class TorchNPUBackendImpl(AttentionImpl):
         if alibi_slopes is not None:
             alibi_slopes = torch.tensor(alibi_slopes, dtype=torch.float32)
         self.alibi_slopes = alibi_slopes
-        self.sliding_window = ((sliding_window, sliding_window)
-                               if sliding_window is not None else (-1, -1))
+        self.sliding_window = sliding_window
         self.kv_cache_dtype = kv_cache_dtype
 
         assert self.num_heads % self.num_kv_heads == 0
@@ -199,7 +203,7 @@ class TorchNPUBackendImpl(AttentionImpl):
         key: torch.Tensor,
         value: torch.Tensor,
         kv_cache: List[torch.Tensor],
-        attn_metadata: AscendMetadata,
+        attn_metadata: TorchNPUMetadata,
         kv_scale: float = 1.0,
         k_scale: float = 1.0,
         v_scale: float = 1.0,
@@ -235,7 +239,7 @@ class TorchNPUBackendImpl(AttentionImpl):
             else:
                 slot_indices = attn_metadata.decode_metadata.slot_mapping
             key_cache, value_cache = kv_cache[0], kv_cache[1]
-            AscendPagedAttention.write_to_paged_cache(
+            write_to_paged_cache(
                 key,
                 value,
                 key_cache,
