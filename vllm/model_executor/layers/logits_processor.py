@@ -98,7 +98,7 @@ class LogitsProcessor(nn.Module):
             logits = tensor_model_parallel_all_gather(logits)
         else:
             # None may be returned for rank > 0
-            logits = tensor_model_parallel_gather(logits)
+            logits = logits
         return logits
 
     def _get_logits(

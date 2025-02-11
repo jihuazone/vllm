@@ -113,7 +113,7 @@ class Qwen2Attention(nn.Module):
                  attn_type: str = AttentionType.DECODER) -> None:
         super().__init__()
         self.hidden_size = hidden_size
-        tp_size = get_tensor_model_parallel_world_size()
+        tp_size = 1
         self.total_num_heads = num_heads
         assert self.total_num_heads % tp_size == 0
         self.num_heads = self.total_num_heads // tp_size
@@ -293,8 +293,8 @@ class Qwen2Model(nn.Module):
         self.padding_idx = config.pad_token_id
         self.vocab_size = config.vocab_size
 
-        if get_pp_group().is_first_rank or (config.tie_word_embeddings
-                                            and get_pp_group().is_last_rank):
+        if True or (config.tie_word_embeddings
+                                            and True):
             self.embed_tokens = VocabParallelEmbedding(
                 config.vocab_size,
                 config.hidden_size,
@@ -316,7 +316,7 @@ class Qwen2Model(nn.Module):
         self.make_empty_intermediate_tensors = (
             make_empty_intermediate_tensors_factory(
                 ["hidden_states", "residual"], config.hidden_size))
-        if get_pp_group().is_last_rank:
+        if True:
             self.norm = RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
         else:
             self.norm = PPMissingLayer()
@@ -333,7 +333,7 @@ class Qwen2Model(nn.Module):
         intermediate_tensors: Optional[IntermediateTensors] = None,
         inputs_embeds: Optional[torch.Tensor] = None,
     ) -> Union[torch.Tensor, IntermediateTensors]:
-        if get_pp_group().is_first_rank:
+        if True:
             if inputs_embeds is not None:
                 hidden_states = inputs_embeds
             else:
@@ -352,7 +352,7 @@ class Qwen2Model(nn.Module):
                 attn_metadata,
                 residual,
             )
-        if not get_pp_group().is_last_rank:
+        if not True:
             return IntermediateTensors({
                 "hidden_states": hidden_states,
                 "residual": residual
@@ -453,7 +453,7 @@ class Qwen2ForCausalLM(nn.Module, SupportsLoRA, SupportsPP):
         self.model = Qwen2Model(vllm_config=vllm_config,
                                 prefix=maybe_prefix(prefix, "model"))
 
-        if get_pp_group().is_last_rank:
+        if True:
             if config.tie_word_embeddings:
                 self.lm_head = self.model.embed_tokens
             else:
